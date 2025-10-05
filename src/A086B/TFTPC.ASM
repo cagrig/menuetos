@@ -444,7 +444,7 @@ cfr007:
  inc  dword [fileposition]
  inc  dword [filesize]
    
- jmp  cfr007                                           
+ jmp  cfr007
    
 no_more_data:
    

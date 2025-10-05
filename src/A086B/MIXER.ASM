@@ -464,7 +464,7 @@ scroll_value: dd 1080,1280,1480,1680,1880,2080,2280
    
 bcolor  dd  0x5577c8
    
-wcolor  dd  0x00000000                                                          
+wcolor  dd  0x00000000
    
    
 text:

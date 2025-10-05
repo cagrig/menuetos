@@ -158,11 +158,11 @@ dqt:  call READ
       add esi,2
       mov ebx,eax
       and ebx,28
-      fmul dword [ebx+k2]
+      fmul dword [ebx+k_2]
       mov ebx,eax
       shr ebx,3
       and ebx,4+8+16
-      fmul dword [ebx+k2]
+      fmul dword [ebx+k_2]
       fstp dword [edi+eax]
       dec cl
       jnz .l3
@@ -944,8 +944,8 @@ fld dword[esi+3*4]                   ;f3
 fadd st2,st0
 fsubp st1,st0          ;t20=f5-f3
 fld st0
-fadd st0,st3                ;t25=(t20+t22)*k2
-fmul dword[k+4]                 ;k2 ;t25,t20,t23,t22,t21
+fadd st0,st3                ;t25=(t20+t22)*k_2
+fmul dword[k+4]                 ;k_2 ;t25,t20,t23,t22,t21
 fld st4                         ;t7=t21+t23
 fadd st0,st3                        ;t7,t25,t20,t23,t22,t21
 fld dword[k+12]                 ;k4     ;t6=k4*t20+t25-t7
@@ -1021,8 +1021,8 @@ fld dword[esi+3*32]                  ;f3
 fadd st2,st0
 fsubp st1,st0
 fld st0  ;t20=f5-f3
-fadd st0,st3                        ;t25=(t20+t22)*k2
-fmul dword[k+4]                 ;k2 ;t25,t20,t23,t22,t21
+fadd st0,st3                        ;t25=(t20+t22)*k_2
+fmul dword[k+4]                 ;k_2 ;t25,t20,t23,t22,t21
 fld st4                         ;t7=t21+t23
 fadd st0,st3                        ;t7,t25,t20,t23,t22,t21
 fld dword[k+12]                 ;k4     ;t6=k4*t20+t25-t7
@@ -1128,7 +1128,7 @@ ybr_bgr:  ;edi=bmp ecx=n_BYTES
 	popad
 	ret
 
-recortar:  ;edi=bufer eax=ancho en pixels (ecx,edx)tama¤o deseado
+recortar:  ;edi=bufer eax=ancho en pixels (ecx,edx)tamaÂ¤o deseado
         pushad
         dec edx
         jz .l2
