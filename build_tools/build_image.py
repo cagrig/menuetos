@@ -5,7 +5,6 @@ import hashlib
 import json
 import subprocess
 
-
 def get_files(folder_path, ext, exclude=None):
     ext = ext.lower().lstrip('.')
     matches = []
@@ -25,7 +24,6 @@ def get_files(folder_path, ext, exclude=None):
                     matches.append(os.path.join(root, file))
     
     return matches
-
 
 BUILD_DIR = '../build'
 KERNEL_DIR = 'K086B'
@@ -56,26 +54,20 @@ BOOT_SRC = '../src/BOOTMOSF.ASM'
 BOOT_BIN = BUILD_DIR + '/BOOTMOSF.BIN'
 KERNEL_SRC = '../src/' + KERNEL_DIR + '/KERNEL.ASM'
 KERNEL_BIN = BUILD_DIR + '/' + KERNEL_DIR + '/KERNEL.MNT'
-HASH_FILE = '.build_hash.json'
-IMG_FILE = 'menuetos.img'
+HASH_FILE = BUILD_DIR + '/' + '.build_hash.json'
+IMG_FILE = BUILD_DIR + '/' + 'menuetos.img'
 FLOPPY_SIZE = 1474560  # 1.44MB
 
 def get_file_content(file_path):
-    # Read the file content
     with open(file_path, 'rb') as f:
         file_data = f.read()
 
     # Compress using bz2
     compressed_data = bz2.compress(file_data)
-    # print(compressed_data)
-
     # Encode to base64
     encoded_data = base64.b64encode(compressed_data)
-
     # Convert bytes to string (if needed) [bzipped then base64 encoded]
     return encoded_data.decode('utf-8')
-
-
 
 def sha256_file(path):
     h = hashlib.sha256()
@@ -111,7 +103,6 @@ def compile_kernel():
 def compile_source(src):
     print("Compiling %s.", src)
     if src.lower().endswith(".asm"):
-        # filename = src[:-4]
         filename = os.path.splitext(os.path.basename(src))[0]
         bin = BUILD_DIR + '/' + APP_DIR + '/' + filename + ".BIN"
         try:
@@ -145,36 +136,34 @@ def write_bootloader():
     # Format & add boot code
     f = Volume.vopen(IMG_FILE, 'r+b', 'disk')
     mkfat.fat_mkfs(f, floppy_size)
-    # Step 2: Read the current boot sector
+    # Read the current boot sector
     f.seek(0)
     boot = bytearray(f.read(512))  # Use bytearray to allow mutation
 
-    # Step 3: Decode the bootloader binary (assumed base64-encoded bzipped)
+    # Decode the bootloader binary (assumed base64-encoded bzipped)
     bootcode = bz2.decompress(base64.b64decode(get_file_content(BOOT_BIN)))
 
-    # Step 4: Patch boot sector
+    # Patch boot sector
     boot[0:3] = bootcode[0:3]     # Copy JMP + NOP
     boot[3:11] = bootcode[3:11]   # Copy OEM label (8 bytes)
     boot[11:510] = bootcode[11:510]  # Copy rest of bootloader, up to boot signature
 
-    # Step 5: Preserve boot signature (0x55AA)
+    # Preserve boot signature (0x55AA)
     boot[510:512] = b'\x55\xAA'
 
     print(boot[0:3], boot[3:11])
 
-    # Step 6: Write back patched boot sector
+    # Write back patched boot sector
     f.seek(0)
     f.write(boot)
     f.close()
 
-
 def main():
-
     os.makedirs(BUILD_DIR, exist_ok=True)
     os.makedirs(BUILD_DIR + '/' + KERNEL_DIR, exist_ok=True)
     os.makedirs(BUILD_DIR + '/' + APP_DIR, exist_ok=True)
 
-    # 1. Compute hashes for all source files
+    # Compute hashes for all source files
     ALL_SOURCE_FILES = [BOOT_SRC, KERNEL_SRC] + SOURCE_FILES
     current_hashes = {f: sha256_file(f) for f in ALL_SOURCE_FILES}
     previous_hashes = load_previous_hashes()
